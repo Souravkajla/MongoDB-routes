@@ -22,7 +22,6 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
   },
   password: {
     type: String,
@@ -31,8 +30,24 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
   },
+  productIds: [
+    {
+      productid: {
+        type: String,
+        required: true,
+        unique: true,
+      },
+      title: {
+        type: String,
+        required: true,
+      },
+      price: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
 });
 
 const productSchema = new mongoose.Schema({
@@ -116,6 +131,8 @@ app.post("/purchaseproduct", async (req, res) => {
 
   const product = await Product.findOne({ productid });
   if (product) {
+    user.productIds.push(product._id);
+    await user.save();
     return res.json({
       message: "Purchased Successfully",
       product,
